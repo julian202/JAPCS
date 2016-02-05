@@ -1,0 +1,422 @@
+/*
+ * CommHandshakeTiming.java
+ *
+ * Created on March 6, 2006, 11:43 AM
+ */
+
+package com.pmiapp.apcs;
+
+/**
+ *
+ * @author  Ron V. Webber
+ */
+public class CommHandshakeTiming extends javax.swing.JFrame {
+    
+    /** Creates new form CommHandshakeTiming */
+    public CommHandshakeTiming(APCSCommunication commSystem, com.pmiapp.common.Notifiable callingForm) {
+        initComponents();
+        this.callingForm=callingForm;
+        this.commSystem=commSystem;
+        rt=null;
+    }
+    
+    private boolean aborted;
+    private com.pmiapp.common.Notifiable callingForm;
+    private RunThread rt;
+    private APCSCommunication commSystem;
+    
+    private void setButtons(boolean b) {
+        jButton1.setEnabled(b);
+        jButton2.setEnabled(b);
+        jButton3.setEnabled(b);
+        jButton4.setEnabled(b);
+        jButton5.setEnabled(b);
+        jButton6.setEnabled(b);
+        jButton7.setEnabled(b);
+        jButton8.setEnabled(b);
+        jButton9.setEnabled(!b);
+    }
+    
+    private class RunThread extends java.lang.Thread {
+        private RunThread(int testType, javax.swing.JLabel jLabelX) {
+            this.testType=testType;
+            this.jLabelX=jLabelX;
+        }
+        
+        private int testType;
+        private javax.swing.JLabel jLabelX;
+        
+        @Override
+        public void run() {
+            long t0=System.nanoTime();
+            boolean b;
+            aborted=false;
+            int i=0;
+            int j=0;
+            switch (testType) {
+                case 1: // set rts true loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        commSystem.setRTS(true);
+                    }
+                    jLabelX.setText(""+i);
+                    break;
+                case 2: // set rts false loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        commSystem.setRTS(false);
+                    }
+                    jLabelX.setText(""+i);
+                    break;
+                case 3: // set dtr true loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        commSystem.setDTR(true);
+                    }
+                    jLabelX.setText(""+i);
+                    break;
+                case 4: // set dtr false loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        commSystem.setDTR(false);
+                    }
+                    jLabelX.setText(""+i);
+                    break;
+                case 5: // read cts loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        b=commSystem.isCTS();
+                    }
+                    jLabelX.setText(""+i);
+                    break;
+                case 6: // read dsr loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        b=commSystem.isDSR();
+                    }
+                    jLabelX.setText(""+i);
+                    break;
+                case 7: // check CTS/RTS loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        // set RTS true
+                        commSystem.setRTS(true);
+                        // wait for CTS to be true
+                        while ((aborted==false) && (commSystem.isCTS()==false)) j++;
+                        // set RTS false
+                        commSystem.setRTS(false);
+                        // wait for CTS to be false
+                        while ((aborted==false) && (commSystem.isCTS()==true)) j++;
+                    }
+                    jLabelX.setText(""+i+":"+j);
+                    break;
+                case 8: // check DSR/DTR loop
+                    while ((aborted==false) && (System.nanoTime()-t0<1000000000)) {
+                        i++;
+                        // set DTR true
+                        commSystem.setDTR(true);
+                        // wait for DSR to be true
+                        while ((aborted==false) && (commSystem.isDSR()==false)) j++;
+                        // set DTR false
+                        commSystem.setDTR(false);
+                        // wait for DSR to be false
+                        while ((aborted==false) && (commSystem.isDSR()==true)) j++;
+                    }
+                    jLabelX.setText(""+i+":"+j);
+                    break;
+            }
+            setButtons(true);
+        }
+    }
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jButton9 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+
+        getContentPane().setLayout(new java.awt.GridBagLayout());
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
+
+        jButton1.setText("Set RTS True");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton1, gridBagConstraints);
+
+        jButton2.setText("Set RTS False");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton2, gridBagConstraints);
+
+        jButton3.setText("Set DTR True");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton3, gridBagConstraints);
+
+        jButton4.setText("Set DTR False");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton4, gridBagConstraints);
+
+        jButton5.setText("Read CTS");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton5, gridBagConstraints);
+
+        jButton6.setText("Read DSR");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton6, gridBagConstraints);
+
+        jButton7.setText("Check CTS/RTS");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton7, gridBagConstraints);
+
+        jButton8.setText("Check DSR/DTR");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton8, gridBagConstraints);
+
+        jButton9.setText("Abort");
+        jButton9.setEnabled(false);
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton9ActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jButton9, gridBagConstraints);
+
+        jLabel1.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel1, gridBagConstraints);
+
+        jLabel2.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel2, gridBagConstraints);
+
+        jLabel3.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel3, gridBagConstraints);
+
+        jLabel4.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel4, gridBagConstraints);
+
+        jLabel5.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel5, gridBagConstraints);
+
+        jLabel6.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel6, gridBagConstraints);
+
+        jLabel7.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel7, gridBagConstraints);
+
+        jLabel8.setText("Test has not been run yet");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        getContentPane().add(jLabel8, gridBagConstraints);
+
+        pack();
+    }
+    // </editor-fold>//GEN-END:initComponents
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        setButtons(false);
+        rt=new RunThread(8,jLabel8);
+        rt.start();
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        setButtons(false);
+        rt=new RunThread(7,jLabel7);
+        rt.start();
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        setButtons(false);
+        rt=new RunThread(6,jLabel6);
+        rt.start();
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        setButtons(false);
+        rt=new RunThread(5,jLabel5);
+        rt.start();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        setButtons(false);
+        rt=new RunThread(4,jLabel4);
+        rt.start();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        setButtons(false);
+        rt=new RunThread(3,jLabel3);
+        rt.start();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        setButtons(false);
+        rt=new RunThread(2,jLabel2);
+        rt.start();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        aborted=true;
+        if (rt!=null) {
+            try { rt.join(); }
+            catch (InterruptedException e) {}
+        }
+        callingForm.notifyTaskFinished(this, 0);
+    }//GEN-LAST:event_formWindowClosing
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        setButtons(false);
+        rt=new RunThread(1,jLabel1);
+        rt.start();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        aborted=true;
+    }//GEN-LAST:event_jButton9ActionPerformed
+    
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
+    private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    // End of variables declaration//GEN-END:variables
+    
+}
