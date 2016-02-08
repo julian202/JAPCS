@@ -61,6 +61,7 @@ public class APCSConfig {
         
         // global running parameters
         athena=(GaugeChannel.getConfigValue("Athena",globalProperties,1)==1);
+        volume=(GaugeChannel.getConfigValue("Volume",globalProperties,1)==1);
         qcGauge=(GaugeChannel.getConfigValue("QCGauge",globalProperties,1)==0);
         qcGaugePort=(GaugeChannel.getConfigValue("QCGaugePort",globalProperties,2));
         maxSpeedLP=GaugeChannel.getConfigValue("MaxSpeedLP",groupProperties,1000);
@@ -161,6 +162,7 @@ public class APCSConfig {
     private boolean encoderExists;
     private double encoderFactor;
     private boolean athena;
+    private boolean volume;
     private boolean qcGauge;
     private int qcGaugePort;
     private String supervisorPassword, burstTestLogfile;
@@ -198,6 +200,12 @@ public class APCSConfig {
         //y0 config file, you got an athena temperature controller?
         return athena;
     }
+    protected boolean hasVolume()
+    {
+        //y0 config file, you got volume?
+        return volume;
+    }
+    
     protected boolean hasQCGauge()
     {
         //y0 config file, you got a QC Guge?

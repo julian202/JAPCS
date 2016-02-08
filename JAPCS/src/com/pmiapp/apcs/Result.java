@@ -153,7 +153,12 @@ public class Result extends javax.swing.JDialog {
         getContentPane().add(jLabel4, gridBagConstraints);
 
         jTextField2.setColumns(5);
-        jTextField2.setText(" ");
+        jTextField2.setText("2");
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -218,6 +223,10 @@ public class Result extends javax.swing.JDialog {
         resultsGood=true;
         setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
 
     /**
     * @param args the command line arguments

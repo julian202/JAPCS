@@ -149,6 +149,8 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
     private String fileName, testID;
     private double speedFactor;
     private NumberFormat secondsNumberFormat;
+    private int encoderValue;
+    private int volume;
 
     private class RunMultiTestThread extends java.lang.Thread implements GaugeReadListener, AbortQueriable {
         public RunMultiTestThread(GaugeReadListener parent) {
@@ -165,7 +167,9 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         private double slowDownPressure, microControlStartingSpeed, generatorRange, pressureTolerance;
         private double speedScale, PSL;
         private double targetPressure, pressureAccurate, targetTemperature;
-
+        private boolean useVolume = configSettings.hasVolume();
+        private boolean firstWrite = true;
+        
         // called by any routine that we may call that needs to keep reading the pressure gauge
         // this will update the display, and maybe save the results to the output file
         // only channel 2 is supported for this
@@ -177,8 +181,22 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
                 long t = System.currentTimeMillis();
                 if (t-lastDataStoreTime>=dataStoreIntervalMillis) {
                     lastDataStoreTime+=dataStoreIntervalMillis;
-                    if (outputFileHasBeenSet)
-                        outputFileWriter.printf("%-9.1f\t%4.0f%n\t%.2f", (t-testTime0)/1000., currentPressure, currentTemp);
+                    if (outputFileHasBeenSet){
+                        if (useVolume){
+                            if (firstWrite) {
+                                outputFileWriter.printf("%n%-9s\t%4s\t%7s\t%9s%n","Time", "PSI", "Temp", "Volume(cc)");
+                                firstWrite=false;
+                            }
+                            outputFileWriter.printf("%-9d\t%4.0f\t%7.2f\t%9d%n", (t-testTime0)/1000, currentPressure, currentTemp, volume);
+                        }
+                        else {
+                            if (firstWrite) {
+                                outputFileWriter.printf("%n%-9s\t%4s\t%7s%n","Time", "PSI", "Temp");
+                                firstWrite=false;
+                            }
+                            outputFileWriter.printf("%-9d\t%4.0f\t%7.2f%n", (t-testTime0)/1000, currentPressure, currentTemp);
+                        }
+                    }
                 }
             }
         }
@@ -202,12 +220,22 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
 
         // read pressure, update display, and maybe save the results to the output file
         // saving results moved to this thread's own gaugeReadData routine
+        
         private void readPressure() {
-            gaugeReadData(2, commSystem.rawReading(2),0);
+
+            
+            gaugeReadData(2, commSystem.rawReading(2),0); //writes to a file: temp, pressure and volume.
             currentTemp = commSystem.readAthenaTemp() / 10;
             systemTempText.setText(""+currentTemp+" F");
-        }
+            if (useVolume){
+                //read volume from encoder and multiply it by an encoder factor:          
+                encoderValue = commSystem.readEncoder(1);
+                volume= encoderValue * (int)configSettings.getEncoderFactor();
+                volumeText.setText(""+volume+"");
 
+            }          
+        }
+       
         private void microControl() {
             dp=0;
             if ((Math.abs(currentPressure-targetPressure)>pressureTolerance) && (noiseCount<=7))
@@ -427,6 +455,8 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
 
        @Override
         public void run() {
+            
+            
             // runs the actual multi test
             // background reading of pressure is still going on
             testStartTime=System.currentTimeMillis();
@@ -439,6 +469,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
             double fastPumpY2 = configSettings.getFastPumpMaxPressure();
             boolean fastPumpConnected=false;
             boolean athena = configSettings.hasAthena();
+            
             
             fastPumpCheckBox.setEnabled(false);
             if (usingFastPump) {
@@ -870,6 +901,9 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         motorSpeedCaption = new javax.swing.JLabel();
         systemPressureDisplay = new javax.swing.JLabel();
         motorSpeedDisplay = new javax.swing.JLabel();
+        displayPanel4 = new javax.swing.JPanel();
+        systemPressureCaption2 = new javax.swing.JLabel();
+        volumeText = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         optionMenu = new javax.swing.JMenu();
         resetMenuItem = new javax.swing.JMenuItem();
@@ -964,7 +998,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         });
         targetFrame.add(targetLabel, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(targetFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 160, 567, -1));
+        getContentPane().add(targetFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 210, 567, -1));
 
         dataFileFrame.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Saving File Name Input"));
         dataFileFrame.setLayout(new java.awt.BorderLayout());
@@ -983,7 +1017,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         });
         dataFileFrame.add(dataFileLabel, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(dataFileFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 200, 567, -1));
+        getContentPane().add(dataFileFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 250, 567, -1));
 
         plotPanelHolder.setLayout(new java.awt.GridBagLayout());
 
@@ -991,7 +1025,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         plotPanelSubHolder.setLayout(new java.awt.BorderLayout());
         plotPanelHolder.add(plotPanelSubHolder, new java.awt.GridBagConstraints());
 
-        getContentPane().add(plotPanelHolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 345, 170));
+        getContentPane().add(plotPanelHolder, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 345, 170));
 
         spacerLabel1.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
         spacerLabel1.setForeground(new java.awt.Color(192, 0, 0));
@@ -1018,7 +1052,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         gridBagConstraints.insets = new java.awt.Insets(3, 1, 3, 1);
         secondPressureFrame.add(secondPressureDisplay, gridBagConstraints);
 
-        getContentPane().add(secondPressureFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 240, 214, -1));
+        getContentPane().add(secondPressureFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 290, 214, -1));
 
         speedFactorFrame.setBorder(javax.swing.BorderFactory.createTitledBorder("Speed Factor"));
         speedFactorFrame.setLayout(new java.awt.GridBagLayout());
@@ -1050,7 +1084,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         gridBagConstraints.weightx = 1.0;
         speedFactorFrame.add(speedFactorScrollBar, gridBagConstraints);
 
-        getContentPane().add(speedFactorFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 270, 214, -1));
+        getContentPane().add(speedFactorFrame, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 320, 214, -1));
 
         fastPumpPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Air Operated Hydraulic Pump Control"));
         fastPumpPanel.setLayout(new java.awt.GridBagLayout());
@@ -1058,13 +1092,13 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         fastPumpCheckBox.setText("Use Air Operated Hydraulic Pump");
         fastPumpPanel.add(fastPumpCheckBox, new java.awt.GridBagConstraints());
 
-        getContentPane().add(fastPumpPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 320, 214, -1));
+        getContentPane().add(fastPumpPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 370, 214, -1));
 
         displayPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         displayPanel3.setPreferredSize(new java.awt.Dimension(179, 46));
         displayPanel3.setLayout(new java.awt.GridBagLayout());
 
-        systemPressureCaption1.setText("Target Temperature");
+        systemPressureCaption1.setText("Target Temperature   ");
         displayPanel3.add(systemPressureCaption1, new java.awt.GridBagConstraints());
 
         motorSpeedCaption1.setText("System Temperature");
@@ -1105,7 +1139,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         displayPanel3.add(systemTempText, gridBagConstraints);
 
-        getContentPane().add(displayPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 110, 200, 50));
+        getContentPane().add(displayPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 110, 210, 50));
 
         displayPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         displayPanel1.setLayout(new java.awt.GridBagLayout());
@@ -1154,7 +1188,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         displayPanel1.add(holdingTimeDisplay, gridBagConstraints);
 
-        getContentPane().add(displayPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(357, 11, 206, -1));
+        getContentPane().add(displayPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 10, 210, -1));
 
         displayPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         displayPanel2.setLayout(new java.awt.GridBagLayout());
@@ -1203,7 +1237,31 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         displayPanel2.add(motorSpeedDisplay, gridBagConstraints);
 
-        getContentPane().add(displayPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(357, 63, 206, -1));
+        getContentPane().add(displayPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 60, 210, -1));
+
+        displayPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        displayPanel4.setPreferredSize(new java.awt.Dimension(179, 46));
+        displayPanel4.setLayout(new java.awt.GridBagLayout());
+
+        systemPressureCaption2.setText("          Volume (cc)       ");
+        displayPanel4.add(systemPressureCaption2, new java.awt.GridBagConstraints());
+
+        volumeText.setBackground(new java.awt.Color(0, 0, 0));
+        volumeText.setFont(new java.awt.Font("Monospaced", 1, 12)); // NOI18N
+        volumeText.setForeground(new java.awt.Color(0, 204, 0));
+        volumeText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        volumeText.setText("0");
+        volumeText.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        volumeText.setOpaque(true);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
+        displayPanel4.add(volumeText, gridBagConstraints);
+
+        getContentPane().add(displayPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 170, 210, 30));
 
         optionMenu.setText("Options");
 
@@ -1280,6 +1338,8 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         //  check parameters
+
+        
         if ((pressureList==null) || (timeList==null) ||
             (pressureList.length==0) || (timeList.length==0)) {
             JOptionPane.showMessageDialog(this,"Input Target Pressure File");
@@ -1305,8 +1365,6 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
             outputFileWriter.print("Data Saving Interval:\t");
             outputFileWriter.print(dataSavingInterval);
             outputFileWriter.println("\tSec.");
-            outputFileWriter.println(" Time\t PSI");
-            outputFileWriter.println();
         }
         setupButton.setEnabled(false);
         startButton.setEnabled(false);
@@ -1425,6 +1483,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
     private javax.swing.JPanel displayPanel1;
     private javax.swing.JPanel displayPanel2;
     private javax.swing.JPanel displayPanel3;
+    private javax.swing.JPanel displayPanel4;
     private javax.swing.JMenu exitMenu;
     private javax.swing.JMenuItem exitMenuItem;
     private javax.swing.JCheckBox fastPumpCheckBox;
@@ -1453,6 +1512,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
     private javax.swing.JButton stopButton;
     private javax.swing.JLabel systemPressureCaption;
     private javax.swing.JLabel systemPressureCaption1;
+    private javax.swing.JLabel systemPressureCaption2;
     private javax.swing.JLabel systemPressureDisplay;
     private javax.swing.JLabel systemTempText;
     private javax.swing.JPanel targetFrame;
@@ -1464,6 +1524,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
     private javax.swing.JLabel titleLabel2;
     private javax.swing.JPanel titlePanel;
     private javax.swing.JMenuItem viewMenuItem;
+    private javax.swing.JLabel volumeText;
     // End of variables declaration//GEN-END:variables
 
     /**
