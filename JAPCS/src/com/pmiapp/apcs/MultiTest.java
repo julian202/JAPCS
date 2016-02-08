@@ -971,7 +971,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         });
         controlPanel.add(setupButton);
 
-        getContentPane().add(controlPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(73, 94, -1, -1));
+        getContentPane().add(controlPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 100, -1, -1));
 
         spacerLabel.setFont(new java.awt.Font("SansSerif", 1, 18)); // NOI18N
         spacerLabel.setForeground(new java.awt.Color(192, 0, 0));
@@ -1098,7 +1098,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         displayPanel3.setPreferredSize(new java.awt.Dimension(179, 46));
         displayPanel3.setLayout(new java.awt.GridBagLayout());
 
-        systemPressureCaption1.setText("Target Temperature   ");
+        systemPressureCaption1.setText(" Target Temperature  ");
         displayPanel3.add(systemPressureCaption1, new java.awt.GridBagConstraints());
 
         motorSpeedCaption1.setText("System Temperature");
@@ -1150,7 +1150,7 @@ public class MultiTest extends javax.swing.JFrame implements GaugeReadListener, 
         gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
         displayPanel1.add(targetPressureCaption, gridBagConstraints);
 
-        holdingTimeCaption.setText("Holding Time (sec.)");
+        holdingTimeCaption.setText(" Holding Time (sec.)");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

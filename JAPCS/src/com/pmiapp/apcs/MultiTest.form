@@ -160,7 +160,7 @@
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-          <AbsoluteConstraints x="73" y="94" width="-1" height="-1"/>
+          <AbsoluteConstraints x="60" y="100" width="-1" height="-1"/>
         </Constraint>
       </Constraints>
 
@@ -506,7 +506,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="systemPressureCaption1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Target Temperature   "/>
+            <Property name="text" type="java.lang.String" value=" Target Temperature  "/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -606,7 +606,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="holdingTimeCaption">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Holding Time (sec.)"/>
+            <Property name="text" type="java.lang.String" value=" Holding Time (sec.)"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
